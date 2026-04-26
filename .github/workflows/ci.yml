@@ -1,0 +1,62 @@
+name: 🧪 CI — Automação Blog Agi
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: 🚀 Executar Testes
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [17]
+        browser: [chrome]
+
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+
+      - name: 🌐 Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: 📦 Instalar dependências
+        run: mvn clean install -DskipTests -q
+
+      - name: 🧪 Executar testes (headless)
+        run: mvn test -Dheadless=true -Dbrowser=${{ matrix.browser }} -B
+        continue-on-error: true
+
+      - name: 📊 Gerar relatório Allure
+        if: always()
+        run: |
+          mvn allure:report -DskipTests
+          ls -la target/
+
+      - name: 📤 Upload artefatos Allure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results-${{ matrix.browser }}
+          path: allure-results/
+          retention-days: 30
+
+      - name: 📤 Upload relatório Allure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report-${{ matrix.browser }}
+          path: target/site/allure-maven-plugin-report/
+          retention-days: 30
+

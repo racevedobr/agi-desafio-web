@@ -1,0 +1,42 @@
+name: 📊 Allure Report
+
+on:
+  workflow_run:
+    workflows: ["🧪 CI — Automação Blog Agi"]
+    types: [completed]
+
+jobs:
+  generate-report:
+    name: 📈 Gerar e Publicar Relatório
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: 📥 Download artefatos
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-results-chrome
+          path: allure-results/
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: 📊 Gerar relatório Allure
+        run: |
+          mvn -q allure:report -DskipTests
+          ls -la target/site/allure-maven-plugin-report/
+
+      - name: 🚀 Deploy para GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/site/allure-maven-plugin-report
