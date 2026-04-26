@@ -220,15 +220,23 @@ mvn clean test -Dheadless=true
 
 ---
 
-## 📜 Licença
-
-Este repositório ainda não possui um arquivo `LICENSE`.
-
----
 
 ## 📞 Suporte
 
 Abra uma issue no repositório ou ajuste os placeholders de GitHub conforme o seu usuário/organização.
+
+
+
+## 👤 Autor
+
+**Rodrigo**  
+🔗 [LinkedIn](https://www.linkedin.com/in/rodrigoaacevedo/) • [GitHub](https://github.com/racevedobr)
+
+---
+
+## 📄 Licença
+
+Distribuído sob licença MIT.
 
 ---
 
